@@ -913,7 +913,6 @@ Suite *s21_string_suite(void) {
   tcase_add_test(tc_memmove, test_for_memmove_20);
   tcase_add_test(tc_memmove, test_for_memmove_21);
   tcase_add_test(tc_memmove, test_for_memmove_22);
-  
 
   // strcat
   tcase_add_test(tc_strcat, test_for_strcat_1);
