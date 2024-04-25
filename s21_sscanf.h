@@ -50,42 +50,44 @@ typedef struct token {
 int s21_sscanf(const char *str, const char *format, ...);
 
 /* (0) Helper functions */
-int check_EOF_string(const char *src);
-void write_chars_to_buff(char **str, const char *chars, char *buff,
-                         int16_t width, int start_ind);
-unsigned long long int s21_strntollu(const char *string, char **endptr,
-                                     int basis, int n_byte);
+int has_trailing_whitespace(const char *src);
+void write_chars_to_buffer(char **src, const char *allowed_chars, char *buffer,
+                           int16_t width, int start_index);
+unsigned long long int parse_str_to_unsigned_long_long(const char *string,
+                                                       char **endptr, int basis,
+                                                       int n_byte);
 int s21_isspace(char c);
-void unsigned_type_converter(token *tok, unsigned long long int result,
-                             int sign);
-void int_type_converter(token *tok, long long int result, int sign);
-void float_type_converter(token *tok, long double result);
+void convert_unsigned_type(token *unsigned_token, unsigned long long int result,
+                           int sign);
+void convert_integer_type(token *integer_token, long long int result, int sign);
+void convert_float_type(token *float_token, long double result);
 int s21_isalpha(char c);
 
-/* (1) Token (rules) parsing stage */
-token parse_tokens(char **fstr, va_list *va);
-void fstr_parse_width(char **fstr, token *tok);
-void fstr_parse_length(char **fstr, token *tok);
-void fstr_parse_specifier(char **fstr, token *tok);
-int parse_number_from_fstr(char **fstr);
+token extract_format_token(char **fstr, va_list *va);
 
-void skip_spaces_in_str(char **src);
-void skip_chars_in_buffer(char **src, int *fail, token *tok);
+void process_width_specifier(char **fstr, token *tok);
+void process_length_modifier(char **fstr, token *tok);
+void process_specifier(char **fstr, token *tok);
+int get_number_from_format_string(char **fstr);
 
-/* (2) Memory writing stage */
-void write_tokens_to_memory(char **src, token *tokens, int tok_len, int *res);
-void write_char_to_memory(char **str, int *res, token *tok, int *fail);
-void write_int_to_memory(char **str, int *fail_flag, int *res, token *tok);
-void write_unspec_int_to_memory(char **str, int *fail_flag, int *res,
-                                token *tok);
-void write_float_to_memory(char **str, int *res, token *tok);
-void write_string_to_memory(char **str, const int *fail_flag, int *res,
-                            token *tok);
-void write_unsigned_to_memory(char **str, int *fail_flag, int *res, token *tok);
-void write_hex_or_oct_to_memory(char **str, int *fail_flag, int *res,
-                                token *tok, int base);
-unsigned long long int s21_strntollu(const char *string, char **endptr,
-                                     int basis, int n_byte);
-long double s21_strtold(const char *buffer);
+void skip_whitespace(char **src);
+void skip_matched_buffer_characters(char **src, int *fail, token *tok);
+
+void format_output(char **src, token *tokens, int tok_len, int *res);
+void write_char_from_string(char **src, int *result_count, token *tok,
+                            int *fail_flag);
+void write_integer_to_memory(char **src, int *fail, int *result_count,
+                             token *tok);
+void write_unspecified_int_to_memory(char **src, int *fail_flag,
+                                     int *result_count, token *tok);
+void write_float_value_to_memory(char **src, int *result, token *float_token);
+void write_string_value_to_memory(char **src, const int *fail_flag, int *result,
+                                  token *string_token);
+void write_unsigned_value_to_memory(char **src, int *fail_flag, int *result,
+                                    token *unsigned_token);
+void write_integer_from_hex_or_oct_to_memory(char **src, int *fail_flag,
+                                             int *result, token *integer_token,
+                                             int base);
+long double convert_to_long_double(const char *buffer);
 
 #endif  // SRC_S21_SSCANF_H_

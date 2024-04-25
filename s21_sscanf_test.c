@@ -1101,9 +1101,7 @@ START_TEST(floats_sci2) {
 
   ck_assert_int_eq(res1, res2);
   ck_assert_ldouble_eq(a1, a2);
-  // Unfortunately, assertions for inf do not work correctly in libcheck
-  // ck_assert_ldouble_infinite(a1);
-  // ck_assert_ldouble_infinite(a2);
+
   ck_assert_double_eq(b1, b2);
   ck_assert_float_nan(c1);
   ck_assert_float_nan(c2);
@@ -1564,8 +1562,7 @@ START_TEST(lower_hex_longlong) {
   uint16_t res2 = sscanf(str, fstr, &a2);
 
   ck_assert_int_eq(res1, res2);
-  // ck_assert_unsigned long long int_eq(a1, a2);
-  // ck_assert_uint64_eq(a1, a2);
+
   ck_assert_uint_eq(a1, a2);
 }
 END_TEST
@@ -2266,10 +2263,7 @@ Suite *s21_sscanf_suite() {
   tcase_add_test(tc, floats_sci4);
   tcase_add_test(tc, floats_sci5);
 
-  // [%n] specifier
-
   tcase_add_test(tc, n1);
-
   tcase_add_test(tc, n2);
   tcase_add_test(tc, n3);
   tcase_add_test(tc, n4);

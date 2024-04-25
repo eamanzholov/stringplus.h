@@ -1,7 +1,7 @@
 #include "s21_sscanf.h"
 
 int s21_sscanf(const char *str, const char *fstr, ...) {
-  int eof_fl = check_EOF_string(str), res = 0;
+  int eof_fl = has_trailing_whitespace(str), res = 0;
 
   if (!eof_fl) {
     va_list va;
@@ -15,11 +15,11 @@ int s21_sscanf(const char *str, const char *fstr, ...) {
     token tokens[BUFF_SIZE];
 
     while (*formstr && formstr < fstr + len && tokens_len < BUFF_SIZE) {
-      tokens[tokens_len] = parse_tokens(&formstr, &va);
+      tokens[tokens_len] = extract_format_token(&formstr, &va);
       tokens_len++;
     }
 
-    write_tokens_to_memory(&src, tokens, tokens_len, &res);
+    format_output(&src, tokens, tokens_len, &res);
     va_end(va);
   }
 
@@ -32,20 +32,20 @@ int s21_isalpha(char c) {
   return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
 }
 
-int check_EOF_string(const char *src) {
-  int res = -1;
+int has_trailing_whitespace(const char *src) {
+  int result = -1;
 
   for (int i = 0; src[i]; i++) {
     if (!s21_isspace(src[i]) && src[i] != '\0') {
-      res = 0;
+      result = 0;
       break;
     }
   }
 
-  return res;
+  return result;
 }
 
-token parse_tokens(char **fstr, va_list *va) {
+token extract_format_token(char **fstr, va_list *va) {
   token tok = {.addr = s21_NULL,
                .length_t = NONE_LENGTH,
                .spec = 0,
@@ -54,7 +54,7 @@ token parse_tokens(char **fstr, va_list *va) {
 
   if (s21_isspace(**fstr)) {
     tok.spec = 'z';
-    skip_spaces_in_str(fstr);
+    skip_whitespace(fstr);
   }
 
   if (**fstr == '%' && !tok.spec) {
@@ -66,9 +66,9 @@ token parse_tokens(char **fstr, va_list *va) {
       (*fstr)++;
       tok.spec = 'b';
     } else {
-      fstr_parse_width(fstr, &tok);
-      fstr_parse_length(fstr, &tok);
-      fstr_parse_specifier(fstr, &tok);
+      process_width_specifier(fstr, &tok);
+      process_length_modifier(fstr, &tok);
+      process_specifier(fstr, &tok);
 
       if (tok.width != WIDTH_AST) tok.addr = va_arg(*va, void *);
     }
@@ -89,7 +89,7 @@ token parse_tokens(char **fstr, va_list *va) {
   return tok;
 }
 
-void skip_chars_in_buffer(char **src, int *fail, token *tok) {
+void skip_matched_buffer_characters(char **src, int *fail, token *tok) {
   int test = s21_strspn(*src, tok->buff);
   int len = s21_strlen(tok->buff);
 
@@ -104,12 +104,12 @@ void skip_chars_in_buffer(char **src, int *fail, token *tok) {
     (*src) = (*src) + len;
 }
 
-void fstr_parse_width(char **fstr, token *tok) {
+void process_width_specifier(char **fstr, token *tok) {
   if (**fstr == '*') {
     (*fstr)++;
     tok->width = WIDTH_AST;
   } else {
-    int res = parse_number_from_fstr(fstr);
+    int res = get_number_from_format_string(fstr);
 
     if (res) {
       tok->width = WIDTH_NUMBER;
@@ -118,7 +118,7 @@ void fstr_parse_width(char **fstr, token *tok) {
   }
 }
 
-int parse_number_from_fstr(char **fstr) {
+int get_number_from_format_string(char **fstr) {
   char tmp[BUFF_SIZE] = {'\0'};
 
   int res = 0, i = 0;
@@ -134,7 +134,7 @@ int parse_number_from_fstr(char **fstr) {
   return res;
 }
 
-void fstr_parse_length(char **fstr, token *tok) {
+void process_length_modifier(char **fstr, token *tok) {
   switch (**fstr) {
     case 'h':
       tok->length_t = LENGTH_SHORT;
@@ -155,349 +155,399 @@ void fstr_parse_length(char **fstr, token *tok) {
   }
 }
 
-void fstr_parse_specifier(char **fstr, token *tok) {
+void process_specifier(char **fstr, token *tok) {
   tok->spec = (**fstr);
   (*fstr)++;
 }
 
-void write_tokens_to_memory(char **src, token *tokens, int tok_len, int *res) {
+void format_output(char **src, token *tokens, int tok_len, int *res) {
   char *start = *src;
 
   for (int i = 0, fail = 0; i < tok_len && !fail; i++) {
     char spec = tokens[i].spec;
-    if (spec == 'c') write_char_to_memory(src, res, (tokens + i), &fail);
-    if (spec == 'd') write_int_to_memory(src, &fail, res, (tokens + i));
+    if (spec == 'c') write_char_from_string(src, res, (tokens + i), &fail);
+    if (spec == 'd') write_integer_to_memory(src, &fail, res, (tokens + i));
     if (spec == 'i' || spec == 'p')
-      write_unspec_int_to_memory(src, &fail, res, (tokens + i));
+      write_unspecified_int_to_memory(src, &fail, res, (tokens + i));
     if (spec == 'g' || spec == 'G' || spec == 'f')
-      write_float_to_memory(src, res, (tokens + i));
-    if (spec == 's') write_string_to_memory(src, &fail, res, (tokens + i));
-    if (spec == 'u') write_unsigned_to_memory(src, &fail, res, (tokens + i));
+      write_float_value_to_memory(src, res, (tokens + i));
+    if (spec == 's')
+      write_string_value_to_memory(src, &fail, res, (tokens + i));
+    if (spec == 'u')
+      write_unsigned_value_to_memory(src, &fail, res, (tokens + i));
     if (spec == 'x' || spec == 'X')
-      write_hex_or_oct_to_memory(src, &fail, res, (tokens + i), 16);
+      write_integer_from_hex_or_oct_to_memory(src, &fail, res, (tokens + i),
+                                              16);
     if (spec == 'o')
-      write_hex_or_oct_to_memory(src, &fail, res, (tokens + i), 8);
+      write_integer_from_hex_or_oct_to_memory(src, &fail, res, (tokens + i), 8);
     if (spec == 'n') *((int *)tokens[i].addr) = (*src) - start;
-    if (spec == 'z') skip_spaces_in_str(src);
-    if (spec == 'b') skip_chars_in_buffer(src, &fail, (tokens + i));
+    if (spec == 'z') skip_whitespace(src);
+    if (spec == 'b') skip_matched_buffer_characters(src, &fail, (tokens + i));
   }
 }
 
-void skip_spaces_in_str(char **src) {
+void skip_whitespace(char **src) {
   while (**src && s21_isspace(**src)) {
     (*src)++;
   }
 }
 
-void write_char_to_memory(char **str, int *res, token *tok, int *fail) {
+void write_char_from_string(char **src, int *result_count, token *tok,
+                            int *fail_flag) {
+  *fail_flag = 1;
+  if (**src) {
+    *fail_flag = 0;
+    if (tok->width != WIDTH_AST) {
+      *(char *)tok->addr = **src;
+      (*result_count)++;
+    }
+    (*src)++;
+  }
+}
+
+void write_integer_to_memory(char **src, int *fail, int *result_count,
+                             token *tok) {
+  char buffer[BUFF_SIZE] = {'\0'};
   *fail = 1;
-  while (**str) {
-    *fail = 0;
-    if (tok->width == WIDTH_AST) {
-      (*str)++;
-      break;
+
+  if (s21_strspn(*src, "0123456789+-")) {
+    int sign_length = s21_strspn(*src, "+-");
+
+    if (!(sign_length > 1 ||
+          (sign_length && (tok->width_n <= 1 && tok->width)))) {
+      buffer[0] = **src;
+      (*src)++;
+      write_chars_to_buffer(src, "0123456789", buffer, tok->width_n, 1);
+      if (tok->width != WIDTH_AST) (*result_count)++;
+      *fail = 0;
+    }
+  }
+
+  if (!*fail) {
+    long long int result = s21_atoi(buffer);
+    if (tok->spec == 'p' && tok->width != WIDTH_AST) {
+      unsigned long long int res_unsigned =
+          parse_str_to_unsigned_long_long(buffer, NULL, 16, s21_strlen(buffer));
+      *(int *)tok->addr = (int)res_unsigned;
     } else {
-      *(char *)tok->addr = **str;
-      (*str)++;
-      (*res)++;
-      break;
+      if (tok->width != WIDTH_AST) convert_integer_type(tok, result, 1);
     }
   }
 }
 
-void write_int_to_memory(char **str, int *fail_flag, int *res, token *tok) {
-  long long int result = 0;
-  char buff[BUFF_SIZE] = {'\0'};
-
+void write_unspecified_int_to_memory(char **src, int *fail_flag,
+                                     int *result_count, token *tok) {
   *fail_flag = 1;
+  skip_whitespace(src);
 
-  if (s21_strspn(*str, "0123456789+-")) {
-    int sign = s21_strspn(*str, "+-");
-
-    if (!(sign > 1 || (sign && (tok->width_n <= 1 && tok->width)))) {
-      buff[0] = **str;
-      (*str)++;
-      write_chars_to_buff(str, "0123456789", buff, tok->width_n, 1);
-      if (tok->width != WIDTH_AST) (*res)++;
-      *fail_flag = 0;
-    }
-  }
-
-  result = s21_atoi(buff);
-
-  if (tok->spec == 'p' && tok->width != WIDTH_AST && !*fail_flag) {
-    unsigned long long int ress =
-        s21_strntollu(buff, NULL, 16, s21_strlen(buff));
-    *(int *)tok->addr = (int)ress;
-  } else {
-    if (tok->width != WIDTH_AST && !*fail_flag)
-      int_type_converter(tok, result, 1);
-  }
-
-  if (tok->width != WIDTH_NUMBER)
-    write_chars_to_buff(str, "0123456789", s21_NULL, 0, 0);
-}
-
-void write_unspec_int_to_memory(char **str, int *fail_flag, int *res,
-                                token *tok) {
-  *fail_flag = 1;
-
-  skip_spaces_in_str(str);
-
-  if (s21_strspn(*str, "0x") == 2) {
+  if (s21_strspn(*src, "0x") == 2) {
     *fail_flag = 0;
-    write_hex_or_oct_to_memory(str, fail_flag, res, tok, 16);
-  } else if (s21_strspn(*str, "0") == 1) {
+    write_integer_from_hex_or_oct_to_memory(src, fail_flag, result_count, tok,
+                                            16);
+  } else if (s21_strspn(*src, "0") == 1) {
     *fail_flag = 0;
-    write_hex_or_oct_to_memory(str, fail_flag, res, tok, 8);
-  } else if (s21_strspn(*str, "+-0123456789")) {
+    write_integer_from_hex_or_oct_to_memory(src, fail_flag, result_count, tok,
+                                            8);
+  } else if (s21_strspn(*src, "+-0123456789")) {
     *fail_flag = 0;
-    write_int_to_memory(str, fail_flag, res, tok);
+    write_integer_to_memory(src, fail_flag, result_count, tok);
   }
 }
 
-void write_chars_to_buff(char **str, const char *chars, char *buff,
-                         int16_t width, int start_ind) {
-  while (**str && s21_strspn(*str, chars) != 0) {
-    if ((width && start_ind >= width) || (s21_isspace(**str))) break;
+void write_chars_to_buffer(char **src, const char *allowed_chars, char *buffer,
+                           int16_t width, int start_index) {
+  while (**src && s21_strspn(*src, allowed_chars) != 0) {
+    // Проверка на превышение ширины или на пробельный символ для остановки
+    if ((width && start_index >= width) || (s21_isspace(**src))) break;
 
-    if (buff) buff[start_ind] = **str;
+    // Копирование символа в буфер, если указан
+    if (buffer) buffer[start_index] = **src;
 
-    (*str)++;
-    start_ind++;
+    (*src)++;
+    start_index++;
   }
 }
 
-void write_float_to_memory(char **str, int *res, token *tok) {
+void write_float_value_to_memory(char **src, int *result, token *float_token) {
   int test = 0;
 
-  if (tok->spec == 'f')
-    test = s21_strspn(*str, "0123456789+-");
+  if (float_token->spec == 'f')
+    test = s21_strspn(*src, "0123456789+-");
   else
-    test = s21_strspn(*str, "0123456789eE+-NnaAifIF");
+    test = s21_strspn(*src, "0123456789eE+-NnaAifIF");
 
   if (test) {
-    int sign = s21_strspn(*str, "+-");
-    if (!(sign > 1 || (sign && (tok->width_n <= 1 && tok->width)))) {
+    int sign = s21_strspn(*src, "+-");
+    if (!(sign > 1 ||
+          (sign && (float_token->width_n <= 1 && float_token->width)))) {
       char buff[BUFF_SIZE] = {'\0'};
       int start_ind = 0;
       if (sign) {
-        buff[0] = **str;
+        buff[0] = **src;
         start_ind = 1;
-        (*str)++;
+        (*src)++;
       }
 
-      if (tok->spec == 'f')
-        write_chars_to_buff(str, ".0123456789+-", buff, tok->width_n,
-                            start_ind);
+      if (float_token->spec == 'f')
+        write_chars_to_buffer(src, ".0123456789+-", buff, float_token->width_n,
+                              start_ind);
       else
-        write_chars_to_buff(str, ".0123456789eE+-NnaAifIF", buff, tok->width_n,
-                            start_ind);
+        write_chars_to_buffer(src, ".0123456789eE+-NnaAifIF", buff,
+                              float_token->width_n, start_ind);
 
-      if (tok->width != WIDTH_AST) {
-        long double result = s21_strtold(buff);
-        (*res)++;
-        float_type_converter(tok, result);
+      if (float_token->width != WIDTH_AST) {
+        long double res = convert_to_long_double(buff);
+        (*result)++;
+        convert_float_type(float_token, res);
       }
     }
   }
 
-  if (tok->width != WIDTH_NUMBER) {
-    if (tok->spec == 'f')
-      write_chars_to_buff(str, ".0123456789", s21_NULL, 0, 0);
+  if (float_token->width != WIDTH_NUMBER) {
+    if (float_token->spec == 'f')
+      write_chars_to_buffer(src, ".0123456789", s21_NULL, 0, 0);
     else
-      write_chars_to_buff(str, ".0123456789eE+-NaAifIFn", s21_NULL, 0, 0);
+      write_chars_to_buffer(src, ".0123456789eE+-NaAifIFn", s21_NULL, 0, 0);
   }
 }
 
-void write_string_to_memory(char **str, const int *fail_flag, int *res,
-                            token *tok) {
-  int succ = 0;
-  char buff[BUFF_SIZE] = {'\0'};
-  unsigned int i = 0;
+void write_string_value_to_memory(char **src, const int *fail_flag, int *result,
+                                  token *string_token) {
+  int success = 0;
+  char buffer[BUFF_SIZE] = {'\0'};
+  unsigned int index = 0;
 
-  while (**str != '\0' && !succ && !(*fail_flag)) {
-    if (!s21_isspace(**str)) {
-      succ = 1;
-      while (**str != '\0' && !(*fail_flag)) {
-        buff[i] = **str;
-        i++;
+  while (**src != '\0' && !success && !(*fail_flag)) {
+    if (!s21_isspace(**src)) {
+      success = 1;
+      while (**src != '\0' && !(*fail_flag)) {
+        buffer[index] = **src;
+        index++;
 
-        if (tok->width == WIDTH_NUMBER && i >= tok->width_n) {
+        if (string_token->width == WIDTH_NUMBER &&
+            index >= string_token->width_n) {
           break;
         }
 
-        (*str)++;
+        (*src)++;
 
-        if (s21_isspace(**str)) {
-          (*str)--;
+        if (s21_isspace(**src)) {
+          (*src)--;
           break;
         }
       }
     }
 
-    (*str)++;
+    (*src)++;
   }
 
-  if (tok->width != WIDTH_AST && succ) {
-    s21_strcpy((char *)tok->addr, buff);
-    (*res)++;
+  if (string_token->width != WIDTH_AST && success) {
+    s21_strcpy((char *)string_token->addr, buffer);
+    (*result)++;
   }
 }
 
-void write_unsigned_to_memory(char **str, int *fail_flag, int *res,
-                              token *tok) {
+void write_unsigned_value_to_memory(char **src, int *fail_flag, int *result,
+                                    token *unsigned_token) {
   *fail_flag = 1;
-  skip_spaces_in_str(str);
-  char buff[BUFF_SIZE] = {'\0'};
+  skip_whitespace(src);
+  char buffer[BUFF_SIZE] = {'\0'};
 
-  if (s21_strspn(*str, "0123456789+-")) {
-    int sign = s21_strspn(*str, "+-");
-    if (!((sign > 1 || (sign && (tok->width_n <= 1 && tok->width))))) {
+  if (s21_strspn(*src, "0123456789+-")) {
+    int sign = s21_strspn(*src, "+-");
+    if (!((sign > 1 || (sign && (unsigned_token->width_n <= 1 &&
+                                 unsigned_token->width))))) {
       *fail_flag = 0;
-      buff[0] = **str;
-      (*str)++;
+      buffer[0] = **src;
+      (*src)++;
 
-      write_chars_to_buff(str, "0123456789", buff, tok->width_n, 1);
+      write_chars_to_buffer(src, "0123456789", buffer, unsigned_token->width_n,
+                            1);
 
-      if (tok->width != WIDTH_AST) (*res)++;
+      if (unsigned_token->width != WIDTH_AST) (*result)++;
     }
   }
 
-  unsigned long long int result = s21_atoi(buff);
+  unsigned long long int result_value = s21_atoi(buffer);
 
-  if (tok->width != WIDTH_AST && !*fail_flag)
-    unsigned_type_converter(tok, result, 1);
+  if (unsigned_token->width != WIDTH_AST && !*fail_flag)
+    convert_unsigned_type(unsigned_token, result_value, 1);
 
-  if (tok->width != WIDTH_NUMBER)
-    write_chars_to_buff(str, "0123456789", s21_NULL, 0, 0);
+  if (unsigned_token->width != WIDTH_NUMBER)
+    write_chars_to_buffer(src, "0123456789", s21_NULL, 0, 0);
 }
 
-void write_hex_or_oct_to_memory(char **str, int *fail_flag, int *res,
-                                token *tok, int base) {
+void write_integer_from_hex_or_oct_to_memory(char **src, int *fail_flag,
+                                             int *result, token *integer_token,
+                                             int base) {
   int sign = 1;
   char *ptr = s21_NULL;
-  if (tok->spec == 'p') base = 16;
+  if (integer_token->spec == 'p') base = 16;
 
-  skip_spaces_in_str(str);
-  if (**str == '-') {
-    tok->width_n--;
+  skip_whitespace(src);
+  if (**src == '-') {
+    integer_token->width_n--;
     sign = -1;
-    (*str)++;
+    (*src)++;
   }
-  if (base == 16 && **str == '0' && (*(*str + 1) == 'x' || *(*str + 1) == 'X'))
-    tok->width_n -= 2;
+  if (base == 16 && **src == '0' && (*(*src + 1) == 'x' || *(*src + 1) == 'X'))
+    integer_token->width_n -= 2;
 
-  if (s21_strspn(*str, "0123456789abcdefABCDEF") > 0 ||
-      s21_strspn(*str, "xX0123456789abcdefABCDEF") >= 2) {
-    unsigned long long int result = s21_strntollu(
-        *str, &ptr, base, tok->width ? tok->width_n : s21_strlen(*str));
-    if (tok->width != WIDTH_AST) {
-      *res += 1;
+  if (s21_strspn(*src, "0123456789abcdefABCDEF") > 0 ||
+      s21_strspn(*src, "xX0123456789abcdefABCDEF") >= 2) {
+    unsigned long long int result_value = parse_str_to_unsigned_long_long(
+        *src, &ptr, base,
+        integer_token->width ? integer_token->width_n : s21_strlen(*src));
+    if (integer_token->width != WIDTH_AST) {
+      *result += 1;
 
-      if (tok->spec == 'p')
-        *(int *)tok->addr = (int)result;
+      if (integer_token->spec == 'p')
+        *(int *)integer_token->addr = (int)result_value;
       else
-        unsigned_type_converter(tok, result, sign);
+        convert_unsigned_type(integer_token, result_value, sign);
     }
   } else {
     *fail_flag = 1;
   }
-  unsigned int max = (unsigned int)s21_strspn(*str, "xX0123456789abcdefABCDEF");
+  unsigned int max = (unsigned int)s21_strspn(*src, "xX0123456789abcdefABCDEF");
 
-  if (tok->width != WIDTH_NUMBER)
-    *str += max;
+  if (integer_token->width != WIDTH_NUMBER)
+    *src += max;
   else
-    *str += max < tok->width_n ? max : tok->width_n;
+    *src += max < integer_token->width_n ? max : integer_token->width_n;
 }
 
-void unsigned_type_converter(token *tok, unsigned long long int result,
-                             int sign) {
-  if (tok->length_t == NONE_LENGTH) {
-    *(unsigned int *)tok->addr = sign * (unsigned int)result;
-  } else if (tok->length_t == LENGTH_SHORT) {
-    *(unsigned short int *)tok->addr = sign * (unsigned short int)result;
-  } else if (tok->length_t == LENGTH_LONG) {
-    *(unsigned long int *)tok->addr = sign * (unsigned long int)result;
-  } else if (tok->length_t == LENGTH_LONG_LONG) {
-    *(unsigned long long int *)tok->addr =
+void convert_unsigned_type(token *unsigned_token, unsigned long long int result,
+                           int sign) {
+  if (unsigned_token->length_t == NONE_LENGTH) {
+    *(unsigned int *)unsigned_token->addr = sign * (unsigned int)result;
+  } else if (unsigned_token->length_t == LENGTH_SHORT) {
+    *(unsigned short int *)unsigned_token->addr =
+        sign * (unsigned short int)result;
+  } else if (unsigned_token->length_t == LENGTH_LONG) {
+    *(unsigned long int *)unsigned_token->addr =
+        sign * (unsigned long int)result;
+  } else if (unsigned_token->length_t == LENGTH_LONG_LONG) {
+    *(unsigned long long int *)unsigned_token->addr =
         sign * (unsigned long long int)result;
   }
 }
 
-void int_type_converter(token *tok, long long int result, int sign) {
-  if (tok->spec != 'p') {
-    if (tok->length_t == NONE_LENGTH) {
-      *(int *)tok->addr = sign * (int)result;
-    } else if (tok->length_t == LENGTH_SHORT) {
-      *(short int *)tok->addr = sign * (short int)result;
-    } else if (tok->length_t == LENGTH_LONG) {
-      *(long int *)tok->addr = sign * (long int)result;
-    } else if (tok->length_t == LENGTH_LONG_LONG) {
-      *(long long int *)tok->addr = sign * (long long int)result;
+void convert_integer_type(token *integer_token, long long int result,
+                          int sign) {
+  if (integer_token->spec != 'p') {
+    if (integer_token->length_t == NONE_LENGTH) {
+      *(int *)integer_token->addr = sign * (int)result;
+    } else if (integer_token->length_t == LENGTH_SHORT) {
+      *(short int *)integer_token->addr = sign * (short int)result;
+    } else if (integer_token->length_t == LENGTH_LONG) {
+      *(long int *)integer_token->addr = sign * (long int)result;
+    } else if (integer_token->length_t == LENGTH_LONG_LONG) {
+      *(long long int *)integer_token->addr = sign * (long long int)result;
     }
   }
 }
 
-void float_type_converter(token *tok, long double result) {
-  if (tok->length_t == NONE_LENGTH) *(float *)tok->addr = (float)result;
-  if (tok->length_t == LENGTH_LONG) *(double *)tok->addr = (double)result;
-  if (tok->length_t == LENGTH_LONG_DOUBLE)
-    *(long double *)tok->addr = (long double)result;
+void convert_float_type(token *float_token, long double result) {
+  if (float_token->length_t == NONE_LENGTH) {
+    *(float *)float_token->addr = (float)result;
+  } else if (float_token->length_t == LENGTH_LONG) {
+    *(double *)float_token->addr = (double)result;
+  } else if (float_token->length_t == LENGTH_LONG_DOUBLE) {
+    *(long double *)float_token->addr = (long double)result;
+  }
 }
-unsigned long long int s21_strntollu(const char *string, char **endptr,
-                                     int basis, int n_byte) {
+
+/**
+ * @brief Преобразует строку в беззнаковое целое число с указанным основанием и
+ * длиной.
+ * @param string Строка для преобразования.
+ * @param endptr Указатель на указатель на символ, в котором заканчивается
+ * преобразование.
+ * @param basis Основание системы счисления.
+ * @param n_byte Максимальная длина строки для преобразования.
+ * @return Беззнаковое целое число.
+ */
+unsigned long long int parse_str_to_unsigned_long_long(const char *string,
+                                                       char **endptr, int basis,
+                                                       int n_byte) {
   unsigned long long res = 0;
   short sign = 1;
+
+  // Если указатель endptr не равен NULL, устанавливаем его в NULL.
   if (endptr) *endptr = s21_NULL;
+
+  // Символы, используемые для преобразования.
   char dict[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+  // Обработка знака числа.
   if (*string == '-') {
     sign = -1;
     string++;
   }
+
+  // Обработка префикса 0x для шестнадцатеричного числа.
   if (basis == 16 &&
       (!s21_strncmp(string, "0x", 2) || !s21_strncmp(string, "0X", 2)))
     string += 2;
-  long long val;
-  short exit = 0;
-  while (*string && n_byte && !exit) {
+
+  // Парсинг строки.
+  while (*string && n_byte) {
     char *tmp2;
     char current_sim =
         (*string >= 'a' && *string <= 'z') ? *string - 'a' + 'A' : *string;
     tmp2 = s21_strchr(dict, (int)current_sim);
-    if (!tmp2) {
-      exit = 1;
-    } else {
-      val = (tmp2 - dict) / sizeof(char);
 
+    if (!tmp2) {
+      break;  // Выход, если символ не найден в словаре.
+    } else {
+      // Получение числового значения текущего символа.
+      long long val = (tmp2 - dict) / sizeof(char);
+
+      // Проверка на соответствие основанию.
       if (val >= basis) {
-        exit = 1;
+        break;  // Выход, если значение больше основания.
       } else {
         res = res * basis + val;
         string++;
         n_byte--;
       }
     }
-    if (exit && endptr) {
-    *endptr = (char *)string;
-}
   }
+
+  // Устанавливаем указатель endptr, если передан.
+  if (endptr && *string) {
+    *endptr = (char *)string;
+  }
+
   return res * sign;
 }
 
-static int s21_case_insens_search(const char *buff, const char *pat) {
+/**
+ * @brief Ищет подстроку в строке без учета регистра символов.
+ * @param buff Строка, в которой производится поиск.
+ * @param pat Подстрока, которую нужно найти.
+ * @return 1, если подстрока найдена, иначе 0.
+ */
+static int case_insensitive_search(const char *buff, const char *pat) {
   int found = 0;
   int len = (int)s21_strlen(pat);
 
+  // Перебираем символы строки buff.
   for (int i = 0; buff[i] && !found; i++) {
     int counter = 0;
+
+    // Сравниваем символы подстроки pat с соответствующими символами строки
+    // buff.
     for (int j = 0; j < len; j++) {
+      // Проверяем совпадение символов, игнорируя регистр.
       if ((buff[i] == (pat[j] - 'A') + 'a') ||
           (buff[i] == (pat[j] - 'a') + 'A') || pat[j] == buff[i]) {
         counter++;
-        i++;
+        i++;  // Увеличиваем индекс строки buff.
       }
 
+      // Если длина найденной подстроки равна длине pat, то подстрока найдена.
       if (len == counter) {
         found = 1;
         break;
@@ -508,116 +558,171 @@ static int s21_case_insens_search(const char *buff, const char *pat) {
   return found;
 }
 
-static int s21_includes_inf_nan(const char *buffer) {
-  int res = 0;
+/**
+ * @brief Проверяет, содержит ли строка подстроки "inf" или "nan" (без учета
+ * регистра символов).
+ * @param buffer Строка для проверки.
+ * @return 1, если строка содержит "inf" или "nan", иначе 0.
+ */
+static int includes_inf_nan(const char *buffer) {
+  int result = 0;
 
-  int test1 = s21_case_insens_search(buffer, "inf");
-  int test2 = s21_case_insens_search(buffer, "nan");
+  // Проверяем наличие подстрок "inf" и "nan" в строке buffer.
+  int test1 = case_insensitive_search(buffer, "inf");
+  int test2 = case_insensitive_search(buffer, "nan");
 
+  // Если хотя бы одна из подстрок найдена, устанавливаем результат в 1.
   if (test1 || test2) {
-    res = 1;
+    result = 1;
   }
 
-  return res;
+  return result;
 }
 
-static long double s21_return_nan_inf(const char *buffer) {
+#include <math.h>  // Для INFINITY и NAN
+
+/**
+ * @brief Возвращает INFINITY, если строка содержит подстроку "inf" (независимо
+ * от регистра), и NAN, если строка содержит подстроку "nan" (независимо от
+ * регистра).
+ * @param buffer Строка для проверки.
+ * @return INFINITY, если строка содержит "inf", NAN, если строка содержит
+ * "nan", иначе 0.
+ */
+static long double return_nan_inf(const char *buffer) {
   int res = 0;
 
+  // Проверяем наличие подстрок "inf" и "nan" в строке buffer.
   for (int i = 0; buffer[i]; i++) {
     if (buffer[i] == 'i' || buffer[i] == 'I') {
-      res = 1;
+      res = 1;  // Нашли "inf"
       break;
     }
 
     if (buffer[i] == 'n' || buffer[i] == 'N') {
-      res = 2;
+      res = 2;  // Нашли "nan"
       break;
     }
   }
 
-  return (res == 1) ? INFINITY : NAN;
+  // Возвращаем INFINITY, если найдена подстрока "inf", и NAN, если найдена
+  // подстрока "nan".
+  return (res == 1) ? INFINITY : (res == 2) ? NAN : 0;
 }
 
-static long double s21_apply_exponent(long double res, const char *buffer) {
-  char sign = '+';
-  int expon = 0;
+/**
+ * @brief Применяет экспоненту к числу.
+ * @param res Число, к которому применяется экспонента.
+ * @param buffer Строка с экспонентой.
+ * @return Результат применения экспоненты к числу.
+ */
+static long double apply_exponent(long double res, const char *buffer) {
+  char sign = '+';  // Знак экспоненты
+  int expon = 0;    // Экспонента
 
-  for (char *p = (char *)buffer; *p; p++) {
+  // Поиск символа 'e' или 'E' для определения экспоненты
+  for (const char *p = buffer; *p; p++) {
     if (*p == 'e' || *p == 'E') {
-      sign = *(p + 1);
-      expon = s21_atoi(p + 2);
+      sign = *(p + 1);          // Знак экспоненты
+      expon = s21_atoi(p + 2);  // Экспонента
     }
   }
 
+  // Применение экспоненты к числу
   while (expon) {
     if (sign == '-') {
-      res /= 10.0;
+      res /= 10.0;  // Если знак отрицательный, делим число на 10
     } else {
-      res *= 10.0;
+      res *= 10.0;  // Иначе умножаем число на 10
     }
-    expon--;
+    expon--;  // Уменьшаем значение экспоненты
   }
 
-  return res;
+  return res;  // Возвращаем результат
 }
 
-static int s21_includes_exponent(const char *buffer) {
-  int res = 0;
+/**
+ * @brief Проверяет, содержит ли строка экспоненту.
+ * @param buffer Строка для проверки.
+ * @return 1, если экспонента найдена, иначе 0.
+ */
+static int includes_exponent(const char *buffer) {
+  int res = 0;  // Изначально экспонента не найдена
 
-  for (char *p = (char *)buffer; *p; p++) {
-    if (s21_strspn(p, "eE")) {
-      res = 1;
-      break;
+  // Поиск символов 'e' или 'E' в строке
+  for (const char *p = buffer; *p; p++) {
+    if (s21_strspn(p, "eE")) {  // Если найден символ 'e' или 'E'
+      res = 1;  // Устанавливаем результат в 1
+      break;    // Прекращаем поиск
     }
   }
 
-  return res;
+  return res;  // Возвращаем результат
 }
 
-static long double s21_atof(const char *buffer) {
-  long double frac = 0.0;
-  char *p = (char *)buffer;
-  int minus_flag = (*p == '-');
-  if (*p == '-' || *p == '+') p++;
+/**
+ * @brief Преобразует строку в число с плавающей точкой.
+ * @param buffer Строка для преобразования.
+ * @return Результат преобразования.
+ */
+static long double string_to_float(const char *buffer) {
+  long double frac = 0.0;    // Дробная часть числа
+  char *p = (char *)buffer;  // Указатель на начало строки
+  int minus_flag = (*p == '-');  // Флаг минуса
+  if (*p == '-' || *p == '+') p++;  // Пропускаем знак, если есть
 
-  long double res = s21_atoi(p);
+  long double res = s21_atoi(p);  // Преобразуем целую часть строки в число
 
-  while (s21_isdigit(*p)) p++;
+  while (s21_isdigit(*p)) p++;  // Пропускаем цифры целой части
 
-  if (*p == '.') {
-    p++;
+  if (*p == '.') {  // Если есть десятичная точка
+    p++;            // Пропускаем точку
 
+    // Определяем количество нулей после десятичной точки
     int trailing_zeros = s21_strspn(p, "0");
 
-    frac = s21_atoi(p);
+    frac = s21_atoi(p);  // Преобразуем дробную часть в число
     int tmp = (int)frac;
     while (tmp) {
-      frac /= 10.0;
+      frac /= 10.0;  // Переводим дробную часть в нормальный вид
       tmp /= 10;
     }
     while (trailing_zeros) {
-      frac /= 10.0;
+      frac /= 10.0;  // Убираем нули после точки
       trailing_zeros--;
     }
   }
 
-  res += frac;
+  res += frac;  // Суммируем целую и дробную части
 
-  return minus_flag ? -res : res;
+  return minus_flag ? -res : res;  // Возвращаем результат с учетом знака
 }
 
-long double s21_strtold(const char *buffer) {
+/**
+ * @brief Преобразует строку в значение типа long double, обрабатывая особые
+ * случаи, такие как Inf и NAN, и применяя показатель степени, если он
+ * присутствует.
+ *
+ * @param buffer Указатель на входную строку.
+ * @return long double Преобразованное значение.
+ */
+long double convert_to_long_double(const char *buffer) {
   long double res = 0.0;
-  int includes_inf_nan = s21_includes_inf_nan(buffer);
+  // Проверяем, содержит ли строка Inf или NAN
+  int inf_nan = includes_inf_nan(buffer);
 
-  if (!includes_inf_nan) {
-    res = s21_atof(buffer);
+  // Если строка не представляет собой Inf или NAN
+  if (!inf_nan) {
+    // Преобразуем строку в число с плавающей запятой
+    res = string_to_float(buffer);
 
-    if (s21_includes_exponent(buffer)) {
-      res = s21_apply_exponent(res, buffer);
+    // Если строка содержит показатель степени, применяем его
+    if (includes_exponent(buffer)) {
+      res = apply_exponent(res, buffer);
     }
   }
 
-  return (includes_inf_nan) ? s21_return_nan_inf(buffer) : res;
+  // Возвращаем Inf или NAN, если они присутствуют, иначе преобразованное
+  // значение
+  return (inf_nan) ? return_nan_inf(buffer) : res;
 }

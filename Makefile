@@ -21,10 +21,9 @@ test:
 gcov_report:
 	./s21_test
 	mkdir -p report
-	gcov *.c
 	gcov *.gcda report/
 	mv *.gcov report/
-	~/.local/bin/gcovr -r . --html --html-details -o report/index.html --gcov-ignore-parse-errors
+	~/.local/bin/gcovr -r . --html --html-details -o report/index.html --gcov-ignore-parse-errors 
 	open report/index.html
 
 	
@@ -41,7 +40,8 @@ clean:
 # ~/.local/bin/gcovr -r . --html --html-details -o report/index.html --gcov-ignore-parse-errors
 
 # valgrind --tool=memcheck --leak-check=yes  ./s21_test
+# valgrind --tool=memcheck --leak-check=yes --track-origins=yes ./s21_test
 # gcc -fprofile-arcs -ftest-coverage s21_memchr_test.c s21_string.a -o test_linux -lcheck_pic -pthread -lrt -lm -lsubunit
-# cppcheck --enable=all --suppress=missingIncludeSystem 
-# clang-format -i s21_test.c s21_string.c s21_string.h s21_strerror.c
+# cppcheck --enable=all --suppress=missingIncludeSystem *.c *.h
+# clang-format -i *.c *.h
 # -fsanitize=address -g

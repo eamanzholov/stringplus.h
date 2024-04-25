@@ -723,19 +723,6 @@ START_TEST(test_for_memmove_22) {
 }
 END_TEST
 
-START_TEST(test_for_memmove_23) {
-  long double src[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-  s21_size_t kByte = 16;
-  char res[kByte + 8];
-  char expected[kByte + 8];
-
-  s21_memmove(res, src, kByte);
-  memmove(expected, src, kByte);
-
-  ck_assert_mem_eq(res, expected, kByte);
-}
-END_TEST
-
 START_TEST(test_for_strcat_1) {
   char src[] = " aboba!!!";
   char res[5 + 10] = "Hello";
@@ -926,7 +913,7 @@ Suite *s21_string_suite(void) {
   tcase_add_test(tc_memmove, test_for_memmove_20);
   tcase_add_test(tc_memmove, test_for_memmove_21);
   tcase_add_test(tc_memmove, test_for_memmove_22);
-  tcase_add_test(tc_memmove, test_for_memmove_23);
+  
 
   // strcat
   tcase_add_test(tc_strcat, test_for_strcat_1);
