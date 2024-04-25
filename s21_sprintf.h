@@ -9,16 +9,16 @@
 #define s21_NULL (void *)0
 
 typedef struct {
-    bool minus;
-    bool plus;
-    bool space;
-    bool zero;
-    bool hash;
-    int precision;
-    int is_precision_set;
-    int width;
-    char length;
-    char specifier;
+  bool minus;
+  bool plus;
+  bool space;
+  bool zero;
+  bool hash;
+  int precision;
+  int is_precision_set;
+  int width;
+  char length;
+  char specifier;
 } flags;
 
 int s21_sprintf(char *str, const char *format, ...);
@@ -60,6 +60,5 @@ void format_wchar(char *buff, wchar_t w_c);
 void format_char(flags f, char *buff, char c);
 void format_string(flags f, char *buff, char *str);
 void format_wide_string(flags f, char *buff, wchar_t *wstr);
-int s21_isdigit(char c);
 
 #endif  //  SRC_S21_SPRINTF_H_

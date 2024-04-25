@@ -1,9 +1,10 @@
 #include <check.h>
 #include <string.h>
 
+#include "s21_sprintf_test.h"
+#include "s21_sscanf_test.h"
 #include "s21_string.h"
 #include "s21_test_2.h"
-#include "s21_sprintf_test.h"
 
 // memchr
 START_TEST(test_for_memchr_1) {
@@ -258,15 +259,15 @@ END_TEST
 START_TEST(test_for_strerror) {
   ck_assert_str_eq(s21_strerror(_i), strerror(_i));
 
-  const char *got = s21_strerror(-1);
-  char *expected = strerror(-1);
-  ck_assert_str_eq(got, expected);
+  // const char *got = s21_strerror(-1);
+  // char *expected = strerror(-1);
+  // ck_assert_str_eq(got, expected);
 
   for (int i = -1000; i < 135; i++) {
-        char *got = s21_strerror(i);
-        char *expected = strerror(i);
-        ck_assert_str_eq(got, expected);
-    }
+    char *got = s21_strerror(i);
+    char *expected = strerror(i);
+    ck_assert_str_eq(got, expected);
+  }
 }
 END_TEST
 
@@ -403,383 +404,410 @@ START_TEST(test_for_trim_4) {
 END_TEST
 
 START_TEST(test_for_atoi_1) {
-    char src[] = "  +123123123";
-    ck_assert_int_eq(atoi(src),
-                     s21_atoi(src));
-} END_TEST
+  char src[] = "  +123123123";
+  ck_assert_int_eq(atoi(src), s21_atoi(src));
+}
+END_TEST
 
 START_TEST(test_for_memmove_1) {
-    char src[200] = "";
-    char src2[200] = "";
-    s21_size_t copy_kByte = 0;
+  char src[200] = "";
+  char src2[200] = "";
+  s21_size_t copy_kByte = 0;
 
-    char *res = src;
-    char *expected = src2;
-    s21_size_t check_kByte = 0;
+  char *res = src;
+  char *expected = src2;
+  s21_size_t check_kByte = 0;
 
-    s21_memmove(res, src, copy_kByte);
-    memmove(expected, src2, copy_kByte);
+  s21_memmove(res, src, copy_kByte);
+  memmove(expected, src2, copy_kByte);
 
-    ck_assert_mem_eq(res, expected, check_kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, check_kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_2) {
-    char src[200] = "123SDFAZ`ESFsdfsdf";
-    char src2[200] = "123SDFAZ`ESFsdfsdf";
-    s21_size_t copy_kByte = 10;
+  char src[200] = "123SDFAZ`ESFsdfsdf";
+  char src2[200] = "123SDFAZ`ESFsdfsdf";
+  s21_size_t copy_kByte = 10;
 
-    char res[200] = "";
-    char expected[200] = "";
-    s21_size_t check_kByte = 10;
+  char res[200] = "";
+  char expected[200] = "";
+  s21_size_t check_kByte = 10;
 
-    s21_memmove(res, src, copy_kByte);
-    memmove(expected, src2, copy_kByte);
+  s21_memmove(res, src, copy_kByte);
+  memmove(expected, src2, copy_kByte);
 
-    ck_assert_mem_eq(res, expected, check_kByte);
-} END_TEST
-
+  ck_assert_mem_eq(res, expected, check_kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_3) {
-    char src[200] = "";
-    char src2[200] = "";
-    s21_size_t copy_kByte = 0;
+  char src[200] = "";
+  char src2[200] = "";
+  s21_size_t copy_kByte = 0;
 
-    char res[200] = "i hate memcmp";
-    char expected[200] = "i hate memcmp";
-    s21_size_t check_kByte = 13;
+  char res[200] = "i hate memcmp";
+  char expected[200] = "i hate memcmp";
+  s21_size_t check_kByte = 13;
 
-    s21_memmove(res, src, copy_kByte);
-    memmove(expected, src2, copy_kByte);
+  s21_memmove(res, src, copy_kByte);
+  memmove(expected, src2, copy_kByte);
 
-    ck_assert_mem_eq(res, expected, check_kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, check_kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_4) {
-    char src[200] = "Hate";
-    char src2[200] = "Hate";
-    s21_size_t copy_kByte = 4;
+  char src[200] = "Hate";
+  char src2[200] = "Hate";
+  s21_size_t copy_kByte = 4;
 
-    char res[200] = "i hate memcmp";
-    char expected[200] = "i hate memcmp";
-    s21_size_t check_kByte = 17;
+  char res[200] = "i hate memcmp";
+  char expected[200] = "i hate memcmp";
+  s21_size_t check_kByte = 17;
 
-    s21_memmove(res, src, copy_kByte);
-    memmove(expected, src2, copy_kByte);
+  s21_memmove(res, src, copy_kByte);
+  memmove(expected, src2, copy_kByte);
 
-    ck_assert_mem_eq(res, expected, check_kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, check_kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_5) {
-    char src[200] = "Hate";
-    char src2[200] = "Hate";
-    s21_size_t copy_kByte = 4;
+  char src[200] = "Hate";
+  char src2[200] = "Hate";
+  s21_size_t copy_kByte = 4;
 
-    char res[200] = "i hate memcmp";
-    char expected[200] = "i hate memcmp";
-    s21_size_t check_kByte = 17;
+  char res[200] = "i hate memcmp";
+  char expected[200] = "i hate memcmp";
+  s21_size_t check_kByte = 17;
 
-    s21_memmove(res + 13, src, copy_kByte);
-    memmove(expected + 13, src2, copy_kByte);
+  s21_memmove(res + 13, src, copy_kByte);
+  memmove(expected + 13, src2, copy_kByte);
 
-    ck_assert_mem_eq(res, expected, check_kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, check_kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_6) {
-    char src[200] = "Hate";
-    char src2[200] = "Hate";
-    s21_size_t copy_kByte = 4;
+  char src[200] = "Hate";
+  char src2[200] = "Hate";
+  s21_size_t copy_kByte = 4;
 
-    char res[200] = "i hate memcmp";
-    char expected[200] = "i hate memcmp";
-    s21_size_t check_kByte = 17;
+  char res[200] = "i hate memcmp";
+  char expected[200] = "i hate memcmp";
+  s21_size_t check_kByte = 17;
 
-    s21_memmove(res + 5, src, copy_kByte);
-    memmove(expected + 5, src2, copy_kByte);
+  s21_memmove(res + 5, src, copy_kByte);
+  memmove(expected + 5, src2, copy_kByte);
 
-    ck_assert_mem_eq(res, expected, check_kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, check_kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_7) {
-    char src[200] = "I HATE memmove!!!";
-    char src2[200] = "I HATE memmove!!!";
-    s21_size_t copy_kByte = 17;
+  char src[200] = "I HATE memmove!!!";
+  char src2[200] = "I HATE memmove!!!";
+  s21_size_t copy_kByte = 17;
 
-    char *res = src;
-    char *expected = src2;
-    s21_size_t check_kByte = 34;
+  char *res = src;
+  char *expected = src2;
+  s21_size_t check_kByte = 34;
 
-    s21_memmove(res, src, copy_kByte);
-    memmove(expected, src2, copy_kByte);
+  s21_memmove(res, src, copy_kByte);
+  memmove(expected, src2, copy_kByte);
 
-    ck_assert_mem_eq(res, expected, check_kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, check_kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_8) {
-    char src[200] = "I HATE memmove!!!";
-    char src2[200] = "I HATE memmove!!!";
-    s21_size_t copy_kByte = 17;
+  char src[200] = "I HATE memmove!!!";
+  char src2[200] = "I HATE memmove!!!";
+  s21_size_t copy_kByte = 17;
 
-    char *res = src + 17;
-    char *expected = src2 + 17;
-    s21_size_t check_kByte = 34;
+  char *res = src + 17;
+  char *expected = src2 + 17;
+  s21_size_t check_kByte = 34;
 
-    s21_memmove(res, src, copy_kByte);
-    memmove(expected, src2, copy_kByte);
+  s21_memmove(res, src, copy_kByte);
+  memmove(expected, src2, copy_kByte);
 
-    ck_assert_mem_eq(res, expected, check_kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, check_kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_9) {
-    char src[200] = "I HATE memmove!!!";
-    char src2[200] = "I HATE memmove!!!";
-    s21_size_t copy_kByte = 17;
+  char src[200] = "I HATE memmove!!!";
+  char src2[200] = "I HATE memmove!!!";
+  s21_size_t copy_kByte = 17;
 
-    char *res = src + 5;
-    char *expected = src2 + 5;
-    s21_size_t check_kByte = 34;
+  char *res = src + 5;
+  char *expected = src2 + 5;
+  s21_size_t check_kByte = 34;
 
-    s21_memmove(res, src, copy_kByte);
-    memmove(expected, src2, copy_kByte);
+  s21_memmove(res, src, copy_kByte);
+  memmove(expected, src2, copy_kByte);
 
-    ck_assert_mem_eq(res, expected, check_kByte);
-} END_TEST
-
+  ck_assert_mem_eq(res, expected, check_kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_10) {
-    char src[] = "aboba";
-    s21_size_t kByte = 0;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "aboba";
+  s21_size_t kByte = 0;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_11) {
-    char src[] = "";
-    s21_size_t kByte = 0;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "";
+  s21_size_t kByte = 0;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_12) {
-    char src[] = "I hate memcmp";
-    s21_size_t kByte = 0;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "I hate memcmp";
+  s21_size_t kByte = 0;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
-
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_13) {
-    char src[] = "123";
-    s21_size_t kByte = 1;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "123";
+  s21_size_t kByte = 1;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_14) {
-    char src[] = "aboba";
-    s21_size_t kByte = 1;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "aboba";
+  s21_size_t kByte = 1;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_15) {
-    char src[] = "Zboba";
-    s21_size_t kByte = 1;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "Zboba";
+  s21_size_t kByte = 1;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
-
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_16) {
-    char src[] = "09";
-    s21_size_t kByte = 1;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "09";
+  s21_size_t kByte = 1;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_17) {
-    char src[] = "abobasdafoijasdofjas asdopij";
-    s21_size_t kByte = 28;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "abobasdafoijasdofjas asdopij";
+  s21_size_t kByte = 28;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_18) {
-    char src[] = "aposkd AOSIjFasodijpaoisdjf poisdjfg";
-    s21_size_t kByte = 36;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "aposkd AOSIjFasodijpaoisdjf poisdjfg";
+  s21_size_t kByte = 36;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_19) {
-    char src[] = "aodasf ieuwfh luhasdfLIAUSHD liuh 12li3uh 12i4ouhsdfh";
-    s21_size_t kByte = 53;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] = "aodasf ieuwfh luhasdfLIAUSHD liuh 12li3uh 12i4ouhsdfh";
+  s21_size_t kByte = 53;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_20) {
-    char src[] = "()()(((())):!,....aodasf ieuwfh luhasdfLIAUSHD liuh 12li3uh 12i4ouhsdfh";
-    s21_size_t kByte = 71;
-    char res[kByte+8];
-    char expected[kByte+8];
+  char src[] =
+      "()()(((())):!,....aodasf ieuwfh luhasdfLIAUSHD liuh 12li3uh 12i4ouhsdfh";
+  s21_size_t kByte = 71;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_21) {
-    int src[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    s21_size_t kByte = 4;
-    char res[kByte+8];
-    char expected[kByte+8];
+  int src[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  s21_size_t kByte = 4;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_22) {
-    float src[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    s21_size_t kByte = 8;
-    char res[kByte+8];
-    char expected[kByte+8];
+  float src[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  s21_size_t kByte = 8;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_memmove_23) {
-    long double src[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    s21_size_t kByte = 16;
-    char res[kByte + 8];
-    char expected[kByte + 8];
+  long double src[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+  s21_size_t kByte = 16;
+  char res[kByte + 8];
+  char expected[kByte + 8];
 
-    s21_memmove(res, src, kByte);
-    memmove(expected, src, kByte);
+  s21_memmove(res, src, kByte);
+  memmove(expected, src, kByte);
 
-    ck_assert_mem_eq(res, expected, kByte);
-} END_TEST
+  ck_assert_mem_eq(res, expected, kByte);
+}
+END_TEST
 
 START_TEST(test_for_strcat_1) {
-    char src[] = " aboba!!!";
-    char res[5 + 10] = "Hello";
-    char expected[5 + 10] = "Hello";
+  char src[] = " aboba!!!";
+  char res[5 + 10] = "Hello";
+  char expected[5 + 10] = "Hello";
 
-    s21_strcat(res, src);
-    strcat(expected, src);
+  s21_strcat(res, src);
+  strcat(expected, src);
 
-    ck_assert_str_eq(res, expected);
-} END_TEST
+  ck_assert_str_eq(res, expected);
+}
+END_TEST
 
 START_TEST(test_for_strcat_2) {
-    char src[] = " aboba!!!";
-    char res[0 + 10] = "";
-    char expected[0 + 10] = "";
+  char src[] = " aboba!!!";
+  char res[0 + 10] = "";
+  char expected[0 + 10] = "";
 
-    s21_strcat(res, src);
-    strcat(expected, src);
+  s21_strcat(res, src);
+  strcat(expected, src);
 
-    ck_assert_str_eq(res, expected);
-} END_TEST
+  ck_assert_str_eq(res, expected);
+}
+END_TEST
 
 START_TEST(test_for_strcat_3) {
-    char src[] = "";
-    char res[] = "Hello";
-    char expected[] = "Hello";
+  char src[] = "";
+  char res[] = "Hello";
+  char expected[] = "Hello";
 
-    s21_strcat(res, src);
-    strcat(expected, src);
+  s21_strcat(res, src);
+  strcat(expected, src);
 
-    ck_assert_str_eq(res, expected);
-} END_TEST
+  ck_assert_str_eq(res, expected);
+}
+END_TEST
 
 START_TEST(test_for_strcat_4) {
-    char src[] = "asdfj  asdf aisdfjaiushdfASD SAD asDSad ASDAsdwqqeAS";
-    char res[5 + 53] = "Hello";
-    char expected[5 + 53] = "Hello";
+  char src[] = "asdfj  asdf aisdfjaiushdfASD SAD asDSad ASDAsdwqqeAS";
+  char res[5 + 53] = "Hello";
+  char expected[5 + 53] = "Hello";
 
-    s21_strcat(res, src);
-    strcat(expected, src);
+  s21_strcat(res, src);
+  strcat(expected, src);
 
-    ck_assert_str_eq(res, expected);
-} END_TEST
+  ck_assert_str_eq(res, expected);
+}
+END_TEST
 
 START_TEST(test_for_strcat_5) {
-    char src[] = "asd0fj  asd1f aisdfjw6234A1241SD SA5 asDSad 89SDAsdw7qqeAS";
-    char res[5 + 59] = "Hello";
-    char expected[5 + 59] = "Hello";
+  char src[] = "asd0fj  asd1f aisdfjw6234A1241SD SA5 asDSad 89SDAsdw7qqeAS";
+  char res[5 + 59] = "Hello";
+  char expected[5 + 59] = "Hello";
 
-    s21_strcat(res, src);
-    strcat(expected, src);
+  s21_strcat(res, src);
+  strcat(expected, src);
 
-    ck_assert_str_eq(res, expected);
-} END_TEST
+  ck_assert_str_eq(res, expected);
+}
+END_TEST
 
 START_TEST(test_for_strcat_6) {
-    char src[] = "asd0fj  asd1f aisdfjw6234A1241SD SA5 asDSad 89SDAsdw7qqeAS)(?!.,";
-    char res[5 + 65] = "Hello";
-    char expected[5 + 65] = "Hello";
+  char src[] =
+      "asd0fj  asd1f aisdfjw6234A1241SD SA5 asDSad 89SDAsdw7qqeAS)(?!.,";
+  char res[5 + 65] = "Hello";
+  char expected[5 + 65] = "Hello";
 
-    s21_strcat(res, src);
-    strcat(expected, src);
+  s21_strcat(res, src);
+  strcat(expected, src);
 
-    ck_assert_str_eq(res, expected);
-} END_TEST
+  ck_assert_str_eq(res, expected);
+}
+END_TEST
 
 Suite *s21_string_suite(void) {
   Suite *s1 = suite_create("Tests_for_string");
@@ -899,7 +927,7 @@ Suite *s21_string_suite(void) {
   tcase_add_test(tc_memmove, test_for_memmove_21);
   tcase_add_test(tc_memmove, test_for_memmove_22);
   tcase_add_test(tc_memmove, test_for_memmove_23);
-  
+
   // strcat
   tcase_add_test(tc_strcat, test_for_strcat_1);
   tcase_add_test(tc_strcat, test_for_strcat_2);
@@ -912,26 +940,31 @@ Suite *s21_string_suite(void) {
 }
 
 int main() {
-  Suite *s, *s1, *s2;
-  SRunner *runner, *runner1, *runner2;
+  Suite *s, *s1, *s2, *s3;
+  SRunner *runner, *runner1, *runner2, *runner3;
 
   s = s21_string_suite();
   s1 = s21_string_suite_2();
-  s2 = s21_sprintf_test();
+  s2 = s21_sprintf_suite();
+  s3 = s21_sscanf_suite();
   runner = srunner_create(s);
   runner1 = srunner_create(s1);
   runner2 = srunner_create(s2);
+  runner3 = srunner_create(s3);
   srunner_set_fork_status(runner, CK_NOFORK);
   srunner_set_fork_status(runner1, CK_NOFORK);
   srunner_set_fork_status(runner2, CK_NOFORK);
+  srunner_set_fork_status(runner3, CK_NOFORK);
   // Запуск всех тестов
   srunner_run_all(runner, CK_NORMAL);
   srunner_run_all(runner1, CK_NORMAL);
   srunner_run_all(runner2, CK_NORMAL);
+  srunner_run_all(runner3, CK_NORMAL);
 
   srunner_free(runner);
   srunner_free(runner1);
   srunner_free(runner2);
+  srunner_free(runner3);
 
   return 0;
 }

@@ -28,7 +28,6 @@
         "sunt in culpa qui officia deserunt mollit anim id est laborum."      \
   }
 
-
 #define s21_size_t unsigned long long
 #define s21_NULL (void *)0
 
@@ -42,7 +41,7 @@ char *s21_strncpy(char *dest, const char *src, s21_size_t n);
 s21_size_t s21_strcspn(const char *str1, const char *str2);
 char *s21_strpbrk(const char *str1, const char *str2);
 char *s21_strerror(int errnum);
-// void s21_to_string(char *str, int num);
+
 s21_size_t s21_strlen(const char *str);
 char *s21_strncat(char *str1, const char *str2, s21_size_t n);
 char *s21_insert(const char *src, const char *str, s21_size_t start_index);
@@ -59,7 +58,10 @@ char *s21_strcat(char *dest, const char *src);
 char *s21_strcpy(char *dest, const char *src);
 
 int s21_atoi(const char *str);
+s21_size_t s21_strspn(const char *str1, const char *str2);
 
 void *s21_memmove(void *dest, const void *src, s21_size_t n);
+
+int s21_isdigit(char c);
 
 #endif  // S21_STRING_H_

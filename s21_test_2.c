@@ -10,8 +10,8 @@
 //  ***************************************
 
 START_TEST(test_for_strlen_1) {
-  char *samples[] = LOREM_IPSUM;
-  char *str = samples[_i];
+  const char *samples[] = LOREM_IPSUM;
+  const char *str = samples[_i];
   ck_assert_uint_eq(strlen(str), s21_strlen(str));
 }
 END_TEST
@@ -34,8 +34,7 @@ END_TEST
 
 START_TEST(test_for_strchr_1) {
   char example = 'i';
-  char *samples[] = LOREM_IPSUM;
-  char *str = samples[_i];
+  const char *samples[] = LOREM_IPSUM, *str = samples[_i];
   ck_assert_ptr_eq(strchr(str, example), s21_strchr(str, example));
 }
 END_TEST

@@ -95,6 +95,22 @@ s21_size_t s21_strcspn(const char *str1, const char *str2) {
 
   return count;  // Если не найдено совпадений, возвращаем длину строки str1
 }
+s21_size_t s21_strspn(const char *str1, const char *str2) {
+  s21_size_t counter = 0;
+
+  for (const char *a = str1; *a; a++) {
+    unsigned short was = 0;
+    for (const char *b = str2; *b; b++) {
+      if (*a == *b) {
+        counter++;
+        was = 1;
+        break;
+      }
+    }
+    if (!was) break;
+  }
+  return counter;
+}
 
 char *s21_strpbrk(const char *str1, const char *str2) {
   char *res = s21_NULL;
@@ -205,71 +221,72 @@ int s21_strncmp(const char *str1, const char *str2, s21_size_t n) {
   return res;
 }
 int s21_atoi(const char *str) {
-    int res = 0;
-    int sign = 1;
-    int overflow = 0;
+  int res = 0;
+  int sign = 1;
+  int overflow = 0;
 
-    while (*str == ' ') str++;
+  while (*str == ' ') str++;
 
-    if (*str == '-') {
-        str++;
-        sign = -1;
+  if (*str == '-') {
+    str++;
+    sign = -1;
+  }
+
+  if (*str == '+') {
+    str++;
+  }
+
+  while (*str && *str >= '0' && *str <= '9') {
+    res = res * 10 + (*str - '0');
+    if (res < 0) {
+      overflow = 1;
+      break;
     }
+    str++;
+  }
+  if (overflow)
+    res = sign > 0 ? INT32_MAX : INT32_MIN;
+  else
+    res *= sign;
 
-    if (*str == '+') {
-        str++;
-    }
-
-    while (*str && *str >= '0' && *str <= '9') {
-        res = res * 10 + (*str - '0');
-        if (res < 0) {
-            overflow = 1;
-            break;
-        }
-        str++;
-    }
-    if (overflow)
-        res = sign > 0 ? INT32_MAX : INT32_MIN;
-    else
-        res *= sign;
-
-    return res;
+  return res;
 }
 
 char *s21_strcpy(char *dest, const char *src) {
-    for (int i = 0; src[i]; i++) {
-        dest[i] = src[i];
-    }
+  for (int i = 0; src[i]; i++) {
+    dest[i] = src[i];
+  }
 
-    dest[s21_strlen(src)] = '\0';
+  dest[s21_strlen(src)] = '\0';
 
-    return dest;
+  return dest;
 }
 
 char *s21_strcat(char *dest, const char *src) {
-    int dest_len = s21_strlen(dest);
-    int i = 0;
+  int dest_len = s21_strlen(dest);
+  int i = 0;
 
-    for (; src[i]; i++) {
-        dest[dest_len + i] = src[i];
-    }
+  for (; src[i]; i++) {
+    dest[dest_len + i] = src[i];
+  }
 
-    dest[dest_len + i] = '\0';
+  dest[dest_len + i] = '\0';
 
-    return dest;
+  return dest;
 }
 
 void *s21_memmove(void *dest, const void *src, s21_size_t n) {
-    char *to = (char *)dest;
-    char *from = (char *)src;
+  char *to = (char *)dest;
+  char *from = (char *)src;
 
-    char *tmp = (char *)malloc(sizeof(char) * n);
+  char *tmp = (char *)malloc(sizeof(char) * n);
 
-    if (tmp) {
-        s21_memcpy(tmp, from, n);
-        s21_memcpy(to, tmp, n);
-        free(tmp);
-    }
-    return dest;
+  if (tmp) {
+    s21_memcpy(tmp, from, n);
+    s21_memcpy(to, tmp, n);
+    free(tmp);
+  }
+  return dest;
 }
 
+int s21_isdigit(char c) { return (c >= '0' && c <= '9'); }
