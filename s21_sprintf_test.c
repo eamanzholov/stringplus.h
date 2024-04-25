@@ -755,7 +755,6 @@ START_TEST(float_width) {
   long double val = 15.35;
   ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 START_TEST(float_precision_zero) {
@@ -769,14 +768,6 @@ START_TEST(float_precision_zero) {
   ck_assert_int_eq(s21_ret, sprintf_ret);
   ck_assert_str_eq(str1, str2);
 
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char *format = "%.0Lf";
-  // long double val = 15.35;
-  // ck_assert_int_eq(s21_sprintf(str1, format, val),
-  //                  sprintf(str2, format, val));
-
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -790,14 +781,7 @@ START_TEST(float_precision_empty) {
 
   ck_assert_int_eq(s21_ret, sprintf_ret);
   ck_assert_str_eq(str1, str2);
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char *format = "%.Lf";
-  // long double val = 15.35;
-  // ck_assert_int_eq(s21_sprintf(str1, format, val),
-  //                  sprintf(str2, format, val));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 START_TEST(float_precision_huge) {
@@ -807,7 +791,6 @@ START_TEST(float_precision_huge) {
   long double val = 15.35;
   ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -818,7 +801,6 @@ START_TEST(float_precision_huge_negative) {
   long double val = -15.35581134;
   ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -854,20 +836,6 @@ START_TEST(float_many) {
   ck_assert_int_eq(s21_ret, sprintf_ret);
   ck_assert_str_eq(str1, str2);
 
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char *format = "% .0f %.lf %Lf %f %lf %Lf";
-  // float val = 0;
-  // double val1 = 0;
-  // long double val2 = 3515315.153151;
-  // float val3 = 5.5;
-  // double val4 = 9851.51351;
-  // long double val5 = 95919539159.53151351131;
-  // ck_assert_int_eq(
-  //     s21_sprintf(str1, format, val, val1, val2, val3, val4, val5),
-  //     sprintf(str2, format, val, val1, val2, val3, val4, val5));
-
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 START_TEST(e_precision) {
@@ -887,7 +855,6 @@ START_TEST(e_precision_zero) {
   long double val = 15.35;
   ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -898,7 +865,6 @@ START_TEST(e_precision_empty) {
   long double val = 15.000009121;
   ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 START_TEST(e_precision_huge) {
@@ -919,7 +885,6 @@ START_TEST(e_precision_huge_negative) {
   long double val = -15.35581134;
   ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -966,7 +931,6 @@ START_TEST(e_many) {
   ck_assert_int_eq(s21_sprintf(str1, format, val, val1, val2, val3, val4, val5),
                    sprintf(str2, format, val, val1, val2, val3, val4, val5));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 START_TEST(E_int) {
@@ -976,7 +940,7 @@ START_TEST(E_int) {
   long double val = 4134121;
   ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
 
-  // ck_assert_str_eq(str1, str2);
+
 }
 END_TEST
 START_TEST(all_empty) {
@@ -1103,7 +1067,6 @@ START_TEST(test_many_float) {
       s21_sprintf(str1, "%f%f%f%f", -999.666, 0.0001, 666.999, -100.001),
       sprintf(str2, "%f%f%f%f", -999.666, 0.0001, 666.999, -100.001));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -1570,7 +1533,6 @@ START_TEST(test_sprintf6) {
   ck_assert_int_eq(s21_sprintf(str1, format, 11.123456),
                    sprintf(str2, format, 11.123456));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -1658,15 +1620,6 @@ START_TEST(test_sprintf14) {
 
   ck_assert_str_eq(str1, str2);
 
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char format[] = "% 0.0li% 0.0lu% 0.0ld % 0.0lf";
-
-  // ck_assert_int_eq(
-  //     s21_sprintf(str1, format, 1, 222, 33333333333, -166513.1232),
-  //     sprintf(str2, format, 1, 222, 33333333333, -166513.1232));
-
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -1769,29 +1722,19 @@ START_TEST(test_sprintf24) {
       sprintf(str2, format, 'f', 21, 42, 666.666,
               "Lorem ipsum dolor sit amet. Aut quam ducimus.", 11));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
 START_TEST(test_sprintf25) {
   char str1[1000], str2[1000];
-  const char *format = "%.3f";  // Форматируем с тремя знаками после запятой
+  const char *format = "%.3f";  
   double val = 121.123;
 
   int s21_ret = s21_sprintf(str1, format, val);
   int sprintf_ret = sprintf(str2, format, val);
   ck_assert_int_eq(s21_ret, sprintf_ret);
   ck_assert_str_eq(
-      str1, "121.123");  // Ожидаемое значение с тремя знаками после запятой
-
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char format[] = "%.f";
-
-  // ck_assert_int_eq(s21_sprintf(str1, format, 121.123),
-  //                  sprintf(str2, format, 121.123));
-
-  // ck_assert_str_eq(str1, str2);
+      str1, "121.123");  
 }
 END_TEST
 
@@ -1835,23 +1778,14 @@ END_TEST
 
 START_TEST(test_sprintf29) {
   char str1[1000], str2[1000];
-  const char *format = "%.3f";  // Форматируем с тремя знаками после запятой
+  const char *format = "%.3f";  
   double val = 111.111;
   int s21_ret = s21_sprintf(str1, format, val);
   int sprintf_ret = sprintf(str2, format, val);
 
   ck_assert_int_eq(s21_ret, sprintf_ret);
   ck_assert_str_eq(
-      str1, "111.111");  // Ожидаемое значение с тремя знаками после запятой
-
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char format[] = "%-.f";
-
-  // ck_assert_int_eq(s21_sprintf(str1, format, 111.111),
-  //                  sprintf(str2, format, 111.111));
-
-  // ck_assert_str_eq(str1, str2);
+      str1, "111.111");  
 }
 END_TEST
 
@@ -1885,7 +1819,7 @@ START_TEST(test_sprintf32) {
   ck_assert_int_eq(s21_sprintf(str1, format, 11.111, 222.2222, 666., -555.125),
                    sprintf(str2, format, 11.111, 222.2222, 666., -555.125));
 
-  // ck_assert_str_eq(str1, str2);
+
 }
 END_TEST
 
@@ -1897,7 +1831,7 @@ START_TEST(test_sprintf33) {
 
   ck_assert_int_eq(s21_sprintf(str1, format, x), sprintf(str2, format, x));
 
-  // ck_assert_str_eq(str1, str2);
+
 }
 END_TEST
 
@@ -1909,7 +1843,7 @@ START_TEST(test_sprintf35) {
   ck_assert_int_eq(s21_sprintf(str1, format, 111.184314818),
                    sprintf(str2, format, 111.184314818));
 
-  // ck_assert_str_eq(str1, str2);
+
 }
 END_TEST
 
@@ -1921,7 +1855,7 @@ START_TEST(test_sprintf36) {
   ck_assert_int_eq(s21_sprintf(str1, format, 0.000111, 111.555, 1.999),
                    sprintf(str2, format, 0.000111, 111.555, 1.999));
 
-  // ck_assert_str_eq(str1, str2);
+
 }
 END_TEST
 
@@ -1933,7 +1867,7 @@ START_TEST(test_sprintf37) {
   ck_assert_int_eq(s21_sprintf(str1, format, 0.666666),
                    sprintf(str2, format, 0.666666));
 
-  // ck_assert_str_eq(str1, str2);
+
 }
 END_TEST
 
@@ -1945,7 +1879,6 @@ START_TEST(test_sprintf38) {
   ck_assert_int_eq(s21_sprintf(str1, format, 0.0000999, 111.9999, 6.666),
                    sprintf(str2, format, 0.0000999, 111.9999, 6.666));
 
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -1977,23 +1910,13 @@ END_TEST
 
 START_TEST(test_sprintf41) {
   char str1[1000], str2[1000];
-  const char *format = "%Lf";  // Формат для long double
-  long double a = 111.111;  // Пример long double для передачи
-
+  const char *format = "%Lf";
+  long double a = 111.111;  
   int s21_ret = s21_sprintf(str1, format, a);
   int sprintf_ret = sprintf(str2, format, a);
 
   ck_assert_int_eq(s21_ret, sprintf_ret);
-  ck_assert_str_eq(str1, str2);  // Ожидаем, что строки будут равны
-
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char format[] = "%.Lf";
-  // long double a = 7.9418438184;
-
-  // ck_assert_int_eq(s21_sprintf(str1, format, a), sprintf(str2, format, a));
-
-  // ck_assert_str_eq(str1, str2);
+  ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -2038,17 +1961,6 @@ START_TEST(g_trailing_zero) {
   // int s21_ret = s21_sprintf(str1, format, val);
   // int sprintf_ret = sprintf(str2, format, val);
 
-  // // ck_assert_int_eq(s21_ret, sprintf_ret);
-  // ck_assert_str_eq(str1, str2); // Ожидаем, что строки будут равны
-
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char format[] = "%g";
-  // double hex = 0.50300;
-  // ck_assert_int_eq(s21_sprintf(str1, format, hex),
-  //                  sprintf(str2, format, hex));
-
-  // ck_assert_str_eq(str1, str2);
 }
 END_TEST
 
@@ -2060,14 +1972,7 @@ START_TEST(g_large) {
   ck_assert_int_eq(s21_sprintf(str1, format, hex), sprintf(str2, format, hex));
   ck_assert_str_eq(str1, str2);
 
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char format[] = "%g";
-  // double hex = 5131.43141;
-  // ck_assert_int_eq(s21_sprintf(str1, format, hex),
-  //                  sprintf(str2, format, hex));
-
-  // ck_assert_str_eq(str1, str2);
+ 
 }
 END_TEST
 
@@ -2089,14 +1994,7 @@ START_TEST(g_precision) {
   ck_assert_int_eq(s21_sprintf(str1, format, hex), sprintf(str2, format, hex));
 
   ck_assert_str_eq(str1, str2);
-  // char str1[BUFF_SIZE];
-  // char str2[BUFF_SIZE];
-  // char format[] = "%.5g";
-  // double hex = 0.123000;
-  // ck_assert_int_eq(s21_sprintf(str1, format, hex),
-  //                  sprintf(str2, format, hex));
-
-  // ck_assert_str_eq(str1, str2);
+ 
 }
 END_TEST
 START_TEST(g_precision_zero) {
@@ -2223,7 +2121,7 @@ START_TEST(wide_char) {
   s21_sprintf(str1, format, w);
   sprintf(str2, format, w);
   ck_assert_str_eq(str1, str2);
-  // ck_assert_int_eq(a, b);
+
 }
 
 START_TEST(width_char) {
