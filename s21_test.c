@@ -296,7 +296,7 @@ Suite *s21_string_suite(void) {
   tcase_add_test(tc_strerror, test_for_strerror);
   tcase_add_test(tc_insert, test_for_insert);
   tcase_add_test(tc_trim, test_for_trim);
-  
+
   return s1;
 }
 

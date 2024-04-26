@@ -1,7 +1,4 @@
 #include "s21_test_2.h"
-#include "s21_string.h"
-#include <check.h>
-#include <string.h>
 
 START_TEST(test_for_strlen_1) {
   char test_str[3][10] = {"\0", "\t", "\n"};

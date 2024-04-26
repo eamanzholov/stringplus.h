@@ -18,12 +18,10 @@ test:
 	$(CC) $(CFLAGS) ${TEST_SRC} s21_string.a -o s21_test ${TEST_FLAGS} -fsanitize=address -g
 	./s21_test
 
-gcov_report:
-	./s21_test
+gcov_report: test
 	mkdir -p report
-	gcov *.gcda report/
-	mv *.gcov report/
-	~/.local/bin/gcovr -r . --html --html-details -o report/index.html --gcov-ignore-parse-errors 
+	mv *.gcda *.gcno report/
+	~/.local/bin/gcovr -r . --html --html-details -o report/index.html 
 	open report/index.html
 
 	
