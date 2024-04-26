@@ -29,17 +29,7 @@ clean:
 	rm -rf *.o *.a s21_test *.gcno *.gcda *.info report *.gcov
 
 
-# gcov_report:
-#     gcov s21_test.c s21_test_2.c
-#     $(CC) $(CFLAGS) s21_test.c s21_test_2.c s21_string.a -o test -lcheck_pic -pthread -lrt -lm -lsubunit -fsanitize=address -g
-#     ./test
-#     mkdir -p report
-#     mv *.gcov report/
-# ~/.local/bin/gcovr -r . --html --html-details -o report/index.html --gcov-ignore-parse-errors
-
 # valgrind --tool=memcheck --leak-check=yes  ./s21_test
-# valgrind --tool=memcheck --leak-check=yes --track-origins=yes ./s21_test
-# gcc -fprofile-arcs -ftest-coverage s21_memchr_test.c s21_string.a -o test_linux -lcheck_pic -pthread -lrt -lm -lsubunit
 # cppcheck --enable=all --suppress=missingIncludeSystem *.c *.h
 # clang-format -i *.c *.h
 # -fsanitize=address -g
