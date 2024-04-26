@@ -15,19 +15,6 @@
 
 #define BUFF_SIZE 512
 
-#define LOREM_IPSUM                                                           \
-  {                                                                           \
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, ",              \
-        "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", \
-        "Ut enim ad minim veniam, quis nostrud exercitation ullamco",         \
-        "laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure "   \
-        "dolor",                                                              \
-        "in reprehenderit in voluptate velit esse cillum",                    \
-        "dolore eu fugiat nulla pariatur.",                                   \
-        "Excepteur sint occaecat cupidatat non proident",                     \
-        "sunt in culpa qui officia deserunt mollit anim id est laborum."      \
-  }
-
 #define s21_size_t unsigned long long
 #define s21_NULL (void *)0
 

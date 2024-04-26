@@ -579,8 +579,6 @@ static int includes_inf_nan(const char *buffer) {
   return result;
 }
 
-#include <math.h>  // Для INFINITY и NAN
-
 /**
  * @brief Возвращает INFINITY, если строка содержит подстроку "inf" (независимо
  * от регистра), и NAN, если строка содержит подстроку "nan" (независимо от
