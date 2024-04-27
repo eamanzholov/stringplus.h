@@ -18,13 +18,22 @@ test:
 	$(CC) $(CFLAGS) ${TEST_SRC} s21_string.a -o s21_test ${TEST_FLAGS} -fsanitize=address -g
 	./s21_test
 
+test_macos:
+	$(CC) ${CFLAGS} s21_test.c s21_string.a -o test_macos -lcheck -lm -lpthread
+	./test_macos
+
 gcov_report: test
+	pip install gcovr
 	mkdir -p report
 	mv *.gcda *.gcno report/
 	~/.local/bin/gcovr -r . --html --html-details -o report/index.html 
 	open report/index.html
 
-	
+gcov_report_macos: test_macos
+	lcov -t "test" -o test.info -c -d .
+	genhtml -o report test.info
+	open report/index.html
+
 clean:
 	rm -rf *.o *.a s21_test *.gcno *.gcda *.info report *.gcov
 
