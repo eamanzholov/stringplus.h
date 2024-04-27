@@ -1,4 +1,4 @@
-#include <string.h>
+#include "s21_sprintf.h"
 
 #include "s21_string.h"
 
@@ -261,7 +261,7 @@ char *s21_strerror(int errnum) {
 
   if (errnum >= MAX_ERRLIST || errnum <= MIN_ERRLIST) {
     static char part1[35];
-    sprintf(part1, "%s%d", ERROR, errnum);
+    s21_sprintf(part1, "%s%d", ERROR, errnum);
     ptr = part1;
   } else {
     ptr = maserror[errnum];
