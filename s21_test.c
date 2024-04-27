@@ -195,8 +195,7 @@ START_TEST(test_for_strpbrk_2) {
 END_TEST
 
 START_TEST(test_for_strerror) {
-  
-  for (int i = -1000; i < 135; i++) {
+  for (int i = -1000; i < 1000; i++) {
     char *got = s21_strerror(i);
     char *expected = strerror(i);
     ck_assert_str_eq(got, expected);
